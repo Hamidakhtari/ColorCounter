@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import numpy as np
 from collections import Counter
 from sklearn.cluster import KMeans
+import os
 
 def open_image():
     file_path = filedialog.askopenfilename()
@@ -24,7 +25,7 @@ def load_image(file_path):
     process_image()
 
 def process_image():
-    global img_array, accuracy_slider, color_frame, accuracy_entry, kmeans_entry, mode_var
+    global img_array, accuracy_slider, color_frame, accuracy_entry, kmeans_entry, mode_var, processed_image
     if img_array is None:
         return
 
@@ -44,6 +45,10 @@ def process_image():
     color_counts = Counter(labels)
     cluster_centers = (cluster_centers * 255).astype(int)
     
+    # Create the processed image
+    new_image_array = cluster_centers[labels].reshape(img_array.shape)
+    processed_image = Image.fromarray(new_image_array.astype('uint8'))
+
     for widget in color_frame.winfo_children():
         widget.destroy()
 
@@ -57,6 +62,13 @@ def process_image():
 
         color_label = tk.Label(color_frame, text=f"{hex_color}: {count}", bg=hex_color, fg=text_color)
         color_label.pack(fill='x')
+
+def save_image():
+    if processed_image is None:
+        return
+    file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
+    if file_path:
+        processed_image.save(file_path)
 
 def update_accuracy_from_entry(event):
     try:
@@ -128,6 +140,9 @@ kmeans_entry.bind("<Return>", update_kmeans_clusters)
 kmeans_entry.pack()
 kmeans_entry.config(state="disabled")
 
+save_button = tk.Button(root, text="Save Processed Image", command=save_image)
+save_button.pack()
+
 img_label = tk.Label(root)
 img_label.pack()
 
@@ -136,5 +151,6 @@ color_frame.pack(fill='both', expand=True)
 
 img = None
 img_array = None
+processed_image = None
 
 root.mainloop()
