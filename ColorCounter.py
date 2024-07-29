@@ -108,9 +108,6 @@ root = tk.Tk()
 root.title("Image Color Counter")
 
 # Create UI elements
-title_label = tk.Label(root, text="PARIA ❤️", font=("Helvetica", 24))
-title_label.pack()
-
 open_button = tk.Button(root, text="Open Image", command=open_image)
 open_button.pack()
 
